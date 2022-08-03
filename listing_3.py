@@ -3,8 +3,8 @@
 import time
 import network
  
-ssid = '<Your Wifi Network Name>'
-password = '<Your Wifi Password>'
+ssid = "<Your Wifi Network Name>"
+password = "<Your Wifi Password>"
  
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
