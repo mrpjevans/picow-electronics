@@ -32,7 +32,7 @@ def button_handler(pin):
     if buttons[bouncy_button_pressed].value() is 1:
         
         button_pressed = bouncy_button_pressed - 17
-        print("Button {button} pressed".forat(button=button_pressed))
+        print("Button {button} pressed".format(button=button_pressed))
         if button_pressed is not 4:
             data = call_openweathermap_api("weather")
 
@@ -59,12 +59,6 @@ def button_handler(pin):
             aqi = data['list'][0]['main']['aqi']
             print("Air Quality Index: {aqi}/5".format(aqi=aqi))
             light_range(aqi, [1, 2, 3, 4])
-
-# Add the handler code to the four buttons
-buttons = {};
-for gpio_number in range(18, 22):
-    buttons[gpio_number] = Pin(gpio_number, Pin.IN, Pin.PULL_DOWN)
-    buttons[gpio_number].irq(trigger=Pin.IRQ_RISING, handler=button_handler)
 
 def connect_to_wifi():
     global ssid, password
@@ -103,8 +97,6 @@ def buzz(ms):
 def call_openweathermap_api(endpoint):
     global lat, lon, api_key
 
-    wlan = connect_to_wifi()
-
     url = "https://api.openweathermap.org/data/2.5/{endpoint}?lat={lat}&lon={lon}&appid={appid}&units=metric".format(
         endpoint=endpoint,
         lat=lat,
@@ -129,9 +121,6 @@ def call_openweathermap_api(endpoint):
     data = response.json()
     response.close()
 
-    # Important to tidy up the connection
-    wlan.disconnect()
-
     return data
 
 # Light up the LEDs in sequence
@@ -152,5 +141,18 @@ def light_range(value, bands):
         leds[led_number].off()
     utime.sleep(1)
 
+# Start here!
+buzz(5)
+connect_to_wifi()
+buzz(5)
+
+# Add the handler code to the four buttons
+buttons = {};
+for gpio_number in range(18, 22):
+    buttons[gpio_number] = Pin(gpio_number, Pin.IN, Pin.PULL_DOWN)
+    buttons[gpio_number].irq(trigger=Pin.IRQ_RISING, handler=button_handler)
+
+
+# Loop but let the system breath, 
 while True:
-    pass
+    utime.sleep_ms(10)
